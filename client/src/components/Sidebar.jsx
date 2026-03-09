@@ -15,21 +15,35 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
     const sidebarRef = useRef(null);
 
+    // useEffect(() => {
+    //     function handleClickOutside(event) {
+    //         if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+    //             setIsSidebarOpen(false);
+    //         }
+    //     }
+    //     document.addEventListener("mousedown", handleClickOutside);
+    //     return () => document.removeEventListener("mousedown", handleClickOutside);
+    // }, [setIsSidebarOpen]);
+
     useEffect(() => {
-        function handleClickOutside(event) {
-            if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-                setIsSidebarOpen(false);
-            }
+    const handleClickOutside = (event) => {
+        if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+            setIsSidebarOpen(false);
         }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [setIsSidebarOpen]);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+    };
+}, []);
 
     return (
         <div ref={sidebarRef} className={`z-10 bg-white dark:bg-zinc-900 min-w-68 flex flex-col h-screen border-r border-gray-200 dark:border-zinc-800 max-sm:absolute transition-all ${isSidebarOpen ? 'left-0' : '-left-full'} `} >
             <WorkspaceDropdown />
             <hr className='border-gray-200 dark:border-zinc-800' />
-            <div className='flex-1 overflow-y-scroll no-scrollbar flex flex-col'>
+            <div className='flex-1 overflow-y-auto no-scrollbar flex flex-col'>
                 <div>
                     <div className='p-4'>
                         {menuItems.map((item) => (
@@ -38,10 +52,10 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                                 <p className='text-sm truncate'>{item.name}</p>
                             </NavLink>
                         ))}
-                        <button className='flex w-full items-center gap-3 py-2 px-4 text-gray-800 dark:text-zinc-100 cursor-pointer rounded hover:bg-gray-50 dark:hover:bg-zinc-800/60 transition-all'>
+                        <NavLink to="/settings" className='flex w-full items-center gap-3 py-2 px-4 text-gray-800 dark:text-zinc-100 cursor-pointer rounded hover:bg-gray-50 dark:hover:bg-zinc-800/60 transition-all'>
                             <SettingsIcon size={16} />
                             <p className='text-sm truncate'>Settings</p>
-                        </button>
+                        </NavLink>
                     </div>
                     <MyTasksSidebar />
                     <ProjectSidebar />
