@@ -30,7 +30,7 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        try{ 
+        try{
             if (!formData.team_lead){
                 return toast.error("Please select a team lead.");
             }
@@ -51,7 +51,7 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
             setIsSubmitting(false)
         }
 
-        
+
     };
 
     const removeTeamMember = (email) => {
@@ -147,9 +147,9 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
                         >
                             <option value="">Add team members</option>
                             {currentWorkspace?.members
-                                ?.filter((email) => !formData.team_members.includes(email))
+                                ?.filter((member) => !formData.team_members.includes(member.user.email))
                                 .map((member) => (
-                                    <option key={member.user.email} value={member.email}>
+                                    <option key={member.user.email} value={member.user.email}>
                                         {member.user.email}
                                     </option>
                                 ))}

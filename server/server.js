@@ -28,7 +28,7 @@ app.use("/api/projects", protect , projectRouter);
 
 app.use("/api/tasks", protect , taskRouter);
 
-app.use("/api/tasks", protect, commentRouter);
+app.use("/api/comments", protect, commentRouter);
 
 const PORT = process.env.PORT || 5000;
 

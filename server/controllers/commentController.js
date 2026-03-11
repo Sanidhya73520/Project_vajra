@@ -8,6 +8,10 @@ export const addComment = async (req, res) => {
 
     const task = await prisma.task.findUnique({ where: { id: taskId }, });
 
+    if (!task) {
+      return res.status(404).json({ message: "Task not found." });
+    }
+
     const project = await prisma.project.findUnique({ where: { id: task.projectId },
       include: {members:{ include: {user: true}}} });
 

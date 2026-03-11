@@ -113,7 +113,7 @@ const { organization, isLoaded: orgLoaded } = useOrganization();
     }, [dispatch])
 
     useEffect(() => {
-        if (isLoaded && user) {
+        if (isLoaded && user && workspaces.length === 0) {
             dispatch(fetchWorkspaces({ getToken }))
         }
     }, [user, isLoaded, dispatch])

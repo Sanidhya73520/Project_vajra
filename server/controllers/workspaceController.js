@@ -82,7 +82,7 @@ export const addMember = async (req, res) => {
 
     // Check if user is already a member
     const existingMember = workspace.members.find(
-      (member) => member.userId === userId,
+      (member) => member.userId === user.id,
     );
 
     if (existingMember) {

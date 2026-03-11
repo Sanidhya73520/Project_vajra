@@ -3,8 +3,9 @@ import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { CalendarIcon, MessageCircle, PenIcon } from "lucide-react";
-import { assets } from "../assets/assets";
+import api from "../configs/api";
 
 const TaskDetails = () => {
 
@@ -12,7 +13,8 @@ const TaskDetails = () => {
     const projectId = searchParams.get("projectId");
     const taskId = searchParams.get("taskId");
 
-    const user = { id : 'user_1'}
+    const { getToken } = useAuth();
+    const { user } = useUser();
     const [task, setTask] = useState(null);
     const [project, setProject] = useState(null);
     const [comments, setComments] = useState([]);
@@ -22,19 +24,21 @@ const TaskDetails = () => {
     const { currentWorkspace } = useSelector((state) => state.workspace);
 
     const fetchComments = async () => {
-
+        try {
+            const { data } = await api.get(`/api/comments/${taskId}`, { headers: { Authorization: `Bearer ${await getToken()}` } });
+            setComments(data.comments || []);
+        } catch (error) {
+            console.error("Failed to fetch comments:", error);
+        }
     };
 
     const fetchTaskDetails = async () => {
         setLoading(true);
         if (!projectId || !taskId) return;
-
         const proj = currentWorkspace.projects.find((p) => p.id === projectId);
         if (!proj) return;
-
         const tsk = proj.tasks.find((t) => t.id === taskId);
         if (!tsk) return;
-
         setTask(tsk);
         setProject(proj);
         setLoading(false);
@@ -42,17 +46,10 @@ const TaskDetails = () => {
 
     const handleAddComment = async () => {
         if (!newComment.trim()) return;
-
         try {
-
             toast.loading("Adding comment...");
-
-            //  Simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-
-            const dummyComment = { id: Date.now(), user: { id: 1, name: "User", image: assets.profile_img_a }, content: newComment, createdAt: new Date() };
-            
-            setComments((prev) => [...prev, dummyComment]);
+            const { data } = await api.post('/api/comments', { content: newComment, taskId }, { headers: { Authorization: `Bearer ${await getToken()}` } });
+            setComments((prev) => [...prev, data.comment]);
             setNewComment("");
             toast.dismissAll();
             toast.success("Comment added.");
@@ -63,7 +60,7 @@ const TaskDetails = () => {
         }
     };
 
-    useEffect(() => { fetchTaskDetails(); }, [taskId]);
+    useEffect(() => { fetchTaskDetails(); }, [taskId, projectId, currentWorkspace]);
 
     useEffect(() => {
         if (taskId && task) {
@@ -89,12 +86,12 @@ const TaskDetails = () => {
                         {comments.length > 0 ? (
                             <div className="flex flex-col gap-4 mb-6 mr-2">
                                 {comments.map((comment) => (
-                                    <div key={comment.id} className={`sm:max-w-4/5 dark:bg-gradient-to-br dark:from-zinc-800 dark:to-zinc-900 border border-gray-300 dark:border-zinc-700 p-3 rounded-md ${comment.user.id === user?.id ? "ml-auto" : "mr-auto"}`} >
+                                    <div key={comment.id} className={`sm:max-w-4/5 dark:bg-gradient-to-br dark:from-zinc-800 dark:to-zinc-900 border border-gray-300 dark:border-zinc-700 p-3 rounded-md ${comment.userId === user?.id ? "ml-auto" : "mr-auto"}`} >
                                         <div className="flex items-center gap-2 mb-1 text-sm text-gray-500 dark:text-zinc-400">
                                             <img src={comment.user.image} alt="avatar" className="size-5 rounded-full" />
                                             <span className="font-medium text-gray-900 dark:text-white">{comment.user.name}</span>
                                             <span className="text-xs text-gray-400 dark:text-zinc-600">
-                                                • {format(new Date(comment.createdAt), "dd MMM yyyy, HH:mm")}
+                                                {format(new Date(comment.createdAt), "dd MMM yyyy, HH:mm")}
                                             </span>
                                         </div>
                                         <p className="text-sm text-gray-900 dark:text-zinc-200">{comment.content}</p>

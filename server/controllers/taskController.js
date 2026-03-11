@@ -91,9 +91,18 @@ export const updateTask = async (req, res) => {
       return res.status(403).json({ message: "Forbidden" });
     }
 
+    const { title, description, status, type, priority, assigneeId, due_date } = req.body;
     const updatedTask = await prisma.task.update({
       where: { id: req.params.id },
-      data: req.body,
+      data: {
+        ...(title !== undefined && { title }),
+        ...(description !== undefined && { description }),
+        ...(status !== undefined && { status }),
+        ...(type !== undefined && { type }),
+        ...(priority !== undefined && { priority }),
+        ...(assigneeId !== undefined && { assigneeId }),
+        ...(due_date !== undefined && { due_date: due_date ? new Date(due_date) : null }),
+      },
     });
 
     res.json({ task: updatedTask, message: "Task updated successfully" });

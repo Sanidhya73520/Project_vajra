@@ -136,7 +136,7 @@ const syncWorkspaceMemberCreation = inngest.createFunction(
 // Inngest function to Send email on Task Creation
 const sendTaskAssignmentEmail = inngest.createFunction(
   { id: "send-task-assignment-email" },
-  { event: "task.assigned" },
+  { event: "app/task.assigned" },
   async ({ event, step }) => {
     const { taskId, origin } = event.data;
 
@@ -152,7 +152,7 @@ const sendTaskAssignmentEmail = inngest.createFunction(
       <div style="max-width: 600px">
       <h2>Hi ${task.assignee.name}, </h2>
       <p style = "font-size: 16px;">  You have been assigned a new task : </p>
-      <p style ="font-size: 18px; font-weight:bold, color: #007bff; margin: 8px 0;">${task.title} </p>
+      <p style ="font-size: 18px; font-weight:bold; color: #007bff; margin: 8px 0;">${task.title} </p>
       <div style ="border: 1px solid #ddd; padding: 12px 16px; border-radius:6px; margin-bottom: 30px;">
       <p style = "margin:6px 0;"><strong> Description:</strong>${task.description}</p>
       <p style = "margin:6px 0;"><strong> Due Date:</strong>${new Date(task.due_date).toLocaleDateString()}</p>
@@ -170,7 +170,7 @@ const sendTaskAssignmentEmail = inngest.createFunction(
     });
 
     if (
-      new Date(task.due_date).toLocaleDateString() !== new Date().toDateString()
+      new Date(task.due_date).toDateString() !== new Date().toDateString()
     ) {
       await step.sleepUntil(`wait-for-the-due-date`, new Date(task.due_date));
       await step.run(`check-if-task-is-completed`, async () => {
@@ -185,14 +185,14 @@ const sendTaskAssignmentEmail = inngest.createFunction(
           await step.run(`send-task-reminder-mail`, async () => {
             await sendEmail({
               to: task.assignee.email,
-              sunject: `Reminder for ${task.project.name}`,
+              subject: `Reminder for ${task.project.name}`,
               body: `
 
                    <div style="max-width: 600px">
       <h2>Hi ${task.assignee.name}, </h2>
 
       <p style = "font-size: 16px;">  You have a task due in ${task.project.name}: </p>
-      <p style ="font-size: 18px; font-weight:bold, color: #007bff; margin: 8px 0;">${task.title} </p>
+      <p style ="font-size: 18px; font-weight:bold; color: #007bff; margin: 8px 0;">${task.title} </p>
 
       <div style ="border: 1px solid #ddd; padding: 12px 16px; border-radius:6px; margin-bottom: 30px;">
 
