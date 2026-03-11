@@ -29,7 +29,7 @@ export const createTask = async (req, res) => {
       return res.status(403).json({ message: "Forbidden" });
     } else if (
       assigneeId &&
-      !project.members.find((member) => member.userId === assigneeId)
+      !project.members.find((member) => member.user.id === assigneeId)
     ) {
       return res.status(403).json({ message: "Assignee must be a member of the project" });
     }
@@ -41,7 +41,8 @@ export const createTask = async (req, res) => {
         priority,
         assigneeId,
         status,
-        due_date: new Date(due_date),
+        type,
+        due_date: due_date ? new Date(due_date) : null,
       },
     });
 

@@ -3,6 +3,14 @@ import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { ChevronRightIcon, SettingsIcon, KanbanIcon, ChartColumnIcon, CalendarIcon, ArrowRightIcon } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
+
+    const getProjectSubItems = (projectId) => [
+        { title: 'Tasks', icon: KanbanIcon, url: `/projectsDetail?id=${projectId}&tab=tasks` },
+        { title: 'Analytics', icon: ChartColumnIcon, url: `/projectsDetail?id=${projectId}&tab=analytics` },
+        { title: 'Calendar', icon: CalendarIcon, url: `/projectsDetail?id=${projectId}&tab=calendar` },
+        { title: 'Settings', icon: SettingsIcon, url: `/projectsDetail?id=${projectId}&tab=settings` }
+    ];
+
 const ProjectSidebar = () => {
 
     const location = useLocation();
@@ -11,15 +19,10 @@ const ProjectSidebar = () => {
     const [searchParams] = useSearchParams();
 
     const projects = useSelector(
-        (state) => state?.workspace?.currentWorkspace?.projects || []
-    );
+        (state) => state.workspace?.currentWorkspace?.projects) || []
+    
 
-    const getProjectSubItems = (projectId) => [
-        { title: 'Tasks', icon: KanbanIcon, url: `/projectsDetail?id=${projectId}&tab=tasks` },
-        { title: 'Analytics', icon: ChartColumnIcon, url: `/projectsDetail?id=${projectId}&tab=analytics` },
-        { title: 'Calendar', icon: CalendarIcon, url: `/projectsDetail?id=${projectId}&tab=calendar` },
-        { title: 'Settings', icon: SettingsIcon, url: `/projectsDetail?id=${projectId}&tab=settings` }
-    ];
+
 
     const toggleProject = (id) => {
         const newSet = new Set(expandedProjects);

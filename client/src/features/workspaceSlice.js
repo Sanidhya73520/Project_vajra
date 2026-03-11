@@ -17,6 +17,8 @@ export const fetchWorkspaces = createAsyncThunk(
   },
 );
 
+
+
 const initialState = {
   workspaces: [],
   currentWorkspace: null,

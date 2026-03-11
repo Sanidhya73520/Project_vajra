@@ -7,6 +7,7 @@ export const createProject = async (req, res) => {
     const { userId } = await req.auth();
     const {
       workspaceId,
+      workspace_id,
       description,
       name,
       status,
@@ -18,9 +19,11 @@ export const createProject = async (req, res) => {
       priority,
     } = req.body;
 
+    const workspaceIdFinal = workspaceId || workspace_id;
+
     const workspace = await prisma.workspace.findUnique({
       where: {
-        id: workspaceId,
+        id: workspaceIdFinal,
       },
       include: { members: { include: { user: true } } },
     });
@@ -45,7 +48,7 @@ export const createProject = async (req, res) => {
 
     const project = await prisma.project.create({
       data: {
-        workspaceId,
+        workspaceId : workspaceIdFinal,
         name,
         description,
         status,
@@ -66,7 +69,7 @@ export const createProject = async (req, res) => {
       });
 
       await prisma.projectMember.createMany({
-        data: membbersToAdd.map((memberId) => ({
+        data: membersToAdd.map((memberId) => ({
           projectId: project.id,
           userId: memberId,
         })),
@@ -101,7 +104,7 @@ export const updateProject = async (req, res) => {
     const { userId } = await req.auth();
     const {
       id,
-      workspaceId,
+      workspaceId:workspaceIdFinal,
       description,
       name,
       status,
@@ -116,7 +119,7 @@ export const updateProject = async (req, res) => {
     // check if user has admin role in the workspace
     const workspace = await prisma.workspace.findUnique({
       where: {
-        id: workspaceId,
+        id: workspaceIdFinal,
       },
       include: { members: { include: { user: true } } },
     });
@@ -142,7 +145,7 @@ export const updateProject = async (req, res) => {
     const project = await prisma.project.update({
       where: { id },
       data: {
-        workspaceId,
+        workspaceId: workspaceIdFinal,
         description,
         name,
         status,
@@ -183,12 +186,12 @@ export const addMember = async (req, res) => {
     }
 
     if (project.team_lead !== userId) {
-      return res.status(404).json({ message: "Only Project Lead can add members" });
+      return res.status(403).json({ message: "Only Project Lead can add members" });
     }
 
     //Check if user to be added exists
 
-    const existingMember = project.members.find((member) => member.email === email);
+    const existingMember = project.members.find((member) => member.user.email === email);
 
     if (existingMember) {
       return res.status(400).json({ message: "User is already a member of the project" });
