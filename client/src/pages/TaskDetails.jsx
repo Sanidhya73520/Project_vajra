@@ -24,6 +24,7 @@ const TaskDetails = () => {
     const { currentWorkspace } = useSelector((state) => state.workspace);
 
     const fetchComments = async () => {
+        if (!taskId) return;
         try {
             const { data } = await api.get(`/api/comments/${taskId}`, { headers: { Authorization: `Bearer ${await getToken()}` } });
             setComments(data.comments || []);
@@ -48,7 +49,7 @@ const TaskDetails = () => {
         if (!newComment.trim()) return;
         try {
             toast.loading("Adding comment...");
-            const { data } = await api.post('/api/comments', { content: newComment, taskId }, { headers: { Authorization: `Bearer ${await getToken()}` } });
+            const { data } = await api.post('/api/comments', { taskId: task.id, content: newComment }, { headers: { Authorization: `Bearer ${await getToken()}` } });
             setComments((prev) => [...prev, data.comment]);
             setNewComment("");
             toast.dismissAll();
