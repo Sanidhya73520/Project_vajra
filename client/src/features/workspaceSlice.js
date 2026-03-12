@@ -63,36 +63,13 @@ const workspaceSlice = createSlice({
     },
     addProject: (state, action) => {
       state.currentWorkspace.projects.push(action.payload);
-      // find workspace by id and add project to it
-      state.workspaces = state.workspaces.map((w) =>
-        w.id === state.currentWorkspace.id
-          ? { ...w, projects: w.projects.concat(action.payload) }
-          : w,
-      );
     },
     addTask: (state, action) => {
-      state.currentWorkspace.projects = state.currentWorkspace.projects.map(
-        (p) => {
-          if (p.id === action.payload.projectId) {
-            p.tasks.push(action.payload);
-          }
-          return p;
+      state.currentWorkspace.projects.forEach((p) => {
+        if (p.id === action.payload.projectId) {
+          p.tasks.push(action.payload);
         }
-      );
-
-      // find workspace and project by id and add task to it
-      state.workspaces = state.workspaces.map((w) =>
-        w.id === state.currentWorkspace.id
-          ? {
-              ...w,
-              projects: w.projects.map((p) =>
-                p.id === action.payload.projectId
-                  ? { ...p, tasks: p.tasks.concat(action.payload) }
-                  : p
-              )
-            }
-          : w
-      );
+      });
     },
     updateTask: (state, action) => {
       state.currentWorkspace.projects.forEach((p) => {
@@ -102,44 +79,12 @@ const workspaceSlice = createSlice({
           );
         }
       });
-      // find workspace and project by id and update task in it
-      state.workspaces = state.workspaces.map((w) =>
-        w.id === state.currentWorkspace.id
-          ? {
-              ...w,
-              projects: w.projects.map((p) =>
-                p.id === action.payload.projectId
-                  ? {
-                      ...p,
-                      tasks: p.tasks.map((t) =>
-                        t.id === action.payload.id ? action.payload : t,
-                      )
-                    }
-                  : p
-              )
-            }
-          : w
-      );
     },
     deleteTask: (state, action) => {
-      // action.payload is an array of task IDs
       const taskIds = action.payload;
-      state.currentWorkspace.projects.map((p) => {
+      state.currentWorkspace.projects.forEach((p) => {
         p.tasks = p.tasks.filter((t) => !taskIds.includes(t.id));
-        return p;
       });
-      // find workspace and delete tasks from all its projects
-      state.workspaces = state.workspaces.map((w) =>
-        w.id === state.currentWorkspace.id
-          ? {
-              ...w,
-              projects: w.projects.map((p) => ({
-                ...p,
-                tasks: p.tasks.filter((t) => !taskIds.includes(t.id))
-              }))
-            }
-          : w
-      );
     }
   },
   extraReducers: (builder) => {

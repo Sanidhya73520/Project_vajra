@@ -51,13 +51,14 @@ export const createTask = async (req, res) => {
       include: { assignee: true },
     });
     
-    await inngest.send({  
-      name: "app/task.assigned",
-      data:{
-        taskId:task.id, origin 
-      }
-
-    })
+    if (assigneeId) {
+      await inngest.send({
+        name: "app/task.assigned",
+        data:{
+          taskId: task.id, origin
+        }
+      });
+    }
 
     res.json({ task: taskWithAssignee, message: "Task created successfully" });
   } catch (error) {
@@ -87,11 +88,26 @@ export const updateTask = async (req, res) => {
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
-    } else if (project.team_lead !== userId) {
+    }
+
+    const isTeamLead = project.team_lead === userId;
+    const isProjectMember = project.members.some((m) => m.user.id === userId);
+
+    if (!isTeamLead && !isProjectMember) {
       return res.status(403).json({ message: "Forbidden" });
     }
 
     const { title, description, status, type, priority, assigneeId, due_date } = req.body;
+
+    // Non-lead members can only update status
+    if (!isTeamLead) {
+      const nonStatusFields = [title, description, type, priority, assigneeId, due_date].filter(
+        (f) => f !== undefined
+      );
+      if (nonStatusFields.length > 0) {
+        return res.status(403).json({ message: "Only the team lead can update fields other than status" });
+      }
+    }
     const updatedTask = await prisma.task.update({
       where: { id: req.params.id },
       data: {

@@ -10,14 +10,19 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendEmail = async ({to, subject, body}) => {
-const response = await transporter.sendMail({
-    from: process.env.SENDER_EMAIL,
-    to ,
-    subject ,
-    html:body,
-  });
-
-  return response;
+  try {
+    const response = await transporter.sendMail({
+      from: `"Project Vajra" <${process.env.SENDER_EMAIL}>`,
+      to,
+      subject,
+      html: body,
+    });
+    console.log("Email sent successfully to:", to);
+    return response;
+  } catch (error) {
+    console.error("Failed to send email to:", to, error.message);
+    throw error;
+  }
 }
 
 export default sendEmail; 

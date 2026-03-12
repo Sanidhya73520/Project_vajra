@@ -38,14 +38,21 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
             const {data} = await api.post("/api/projects/", {workspace_id: currentWorkspace.id, ...formData}, {headers: {Authorization: `Bearer ${await getToken()}`}})
 
             dispatch(addProject(data.project))
+            setFormData({
+                name: "",
+                description: "",
+                status: "PLANNING",
+                priority: "MEDIUM",
+                start_date: "",
+                end_date: "",
+                team_members: [],
+                team_lead: "",
+                progress: 0,
+            });
             setIsDialogOpen(false)
         }
         catch(error){
             toast.error(error?.response?.data?.message || error.message);
-
-                    console.log("Current Workspace:", currentWorkspace);
-        console.log("Workspace ID:", currentWorkspace?.id);
-        console.log("Form Data:", formData);
         }
         finally{
             setIsSubmitting(false)

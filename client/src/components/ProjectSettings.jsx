@@ -15,13 +15,13 @@ export default function ProjectSettings({ project }) {
     const {getToken} = useAuth();
 
     const [formData, setFormData] = useState({
-        name: "New Website Launch",
-        description: "Initial launch for new web platform.",
-        status: "PLANNING",
-        priority: "MEDIUM",
-        start_date: "2025-09-10",
-        end_date: "2025-10-15",
-        progress: 30,
+        name: project?.name || "",
+        description: project?.description || "",
+        status: project?.status || "PLANNING",
+        priority: project?.priority || "MEDIUM",
+        start_date: project?.start_date || "",
+        end_date: project?.end_date || "",
+        progress: project?.progress || 0,
     });
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
