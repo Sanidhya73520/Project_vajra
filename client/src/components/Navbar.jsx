@@ -9,6 +9,7 @@ const Navbar = ({ setIsSidebarOpen }) => {
 
     const dispatch = useDispatch();
     const { theme } = useSelector(state => state.theme);
+    
 
     return (
         <div className="w-full bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 xl:px-16 py-3 flex-shrink-0">
